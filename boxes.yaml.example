@@ -1,0 +1,37 @@
+# Copy to boxes.yaml and edit. This file is the single source of truth — both
+# the `devbox` CLI and Terraform read it.
+
+globals:
+  project: your-gcp-project-id
+  zone: us-central1-a
+  ssh_user: yourusername
+  ssh_public_key_path: ~/.ssh/id_ed25519.pub
+  # Tighten to your IP: ["1.2.3.4/32"] (find with `curl ifconfig.me`)
+  allowed_ssh_cidrs:
+    - 0.0.0.0/0
+
+# Per-box defaults. Any field here can be overridden per-box.
+defaults:
+  data_disk_size_gb: 20
+  boot_disk_size_gb: 10
+  image: ubuntu-os-cloud/ubuntu-2204-lts
+  # Minutes of idle (no SSH, low CPU, no GPU, no recent VS Code activity)
+  # before the cron job halts the VM. Cron polls every 5 min.
+  idle_threshold_min: 20
+  # static_ip: reserve a stable external IP (costs ~$0.005/hr while VM is
+  # stopped). Default false → GCE assigns a new ephemeral IP each start;
+  # `devbox start` refreshes ~/.ssh/config so this is transparent.
+  static_ip: false
+
+# Boxes managed by Terraform. Use `devbox newbox` / `deletebox` to edit, or
+# edit by hand. Keys become the GCP instance name (`devbox-<key>`).
+boxes:
+  cpu:
+    machine_type: e2-standard-4
+  # Example GPU box. Add via `devbox newbox ml --machine n1-standard-8 --gpu nvidia-tesla-t4`
+  # ml:
+  #   machine_type: n1-standard-8
+  #   gpu_type: nvidia-tesla-t4
+  #   gpu_preemptible: true
+  #   image: deeplearning-platform-release/common-cu121-ubuntu-2204
+  #   boot_disk_size_gb: 100

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# devbox — manage GCP dev VMs from boxes.yaml.
+# Bootstraps a project-local .venv on first run, then runs the Python CLI.
+
+set -e
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+VENV="$REPO/.venv"
+PYBIN="$VENV/bin/python3"
+
+if [ ! -x "$PYBIN" ]; then
+  echo "→ Creating project venv at $VENV (one-time)…" >&2
+  python3 -m venv "$VENV"
+  "$VENV/bin/pip" install --quiet --upgrade pip
+  "$VENV/bin/pip" install --quiet pyyaml
+fi
+
+exec "$PYBIN" "$REPO/bin/_devbox.py" "$@"

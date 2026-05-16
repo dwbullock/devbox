@@ -1,0 +1,9 @@
+boxes.yaml
+.venv/
+bin/tofu
+.claude/settings.local.json
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/*.tfplan
