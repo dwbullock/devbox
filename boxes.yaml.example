@@ -28,6 +28,15 @@ defaults:
 boxes:
   cpu:
     machine_type: e2-standard-4
+    # Optional: extra apt packages installed at first boot (idempotent on re-boot).
+    # apt_packages: [nodejs, npm, postgresql-client]
+    # Optional: public GitHub repos cloned into /mnt/data on first boot.
+    # Accepts "owner/repo" shorthand or full URLs. Idempotent on re-boot.
+    # Private repos: not yet supported — coming soon (deploy keys / PAT).
+    # github_repos:
+    #   - dwbullock/devbox
+    #   - https://github.com/torvalds/linux.git
+
   # Example GPU box. Add via `devbox newbox ml --machine n1-standard-8 --gpu nvidia-tesla-t4`
   # ml:
   #   machine_type: n1-standard-8

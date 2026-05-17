@@ -140,8 +140,34 @@ boxes:
 ```
 
 Per-box keys: `machine_type` (required), `zone`, `data_disk_size_gb`,
-`boot_disk_size_gb`, `image`, `static_ip`, `idle_threshold_min`, `gpu_type`,
-`gpu_count`, `gpu_preemptible`.
+`boot_disk_size_gb`, `image`, `static_ip`, `idle_threshold_min`, `apt_packages`,
+`github_repos`, `gpu_type`, `gpu_count`, `gpu_preemptible`.
+
+**`apt_packages`** (list of strings, default empty): extra packages installed
+via `apt-get install -y` on first boot. Always installed in addition: `git`,
+`build-essential`, `python3-pip`, `bc`. Idempotent — `apt-get install` skips
+packages already present, so safe across reboots.
+
+**`github_repos`** (list of strings, default empty): public GitHub repos cloned
+shallow into `/mnt/data/<reponame>` on first boot. Accepts `owner/repo`
+shorthand or a full URL. Idempotent — clone is skipped if `/mnt/data/<name>/.git`
+already exists. Private repos are not yet supported (auth design pending —
+deploy keys or PAT in Secret Manager).
+
+```yaml
+boxes:
+  dev1:
+    machine_type: e2-standard-4
+    apt_packages: [nodejs, npm, postgresql-client]
+    github_repos:
+      - dwbullock/devbox
+      - https://github.com/torvalds/linux.git
+```
+
+After changing these on an existing box, `devbox build <name>` updates the
+instance metadata in place — but startup scripts only run at boot, so the new
+packages and repos won't appear until the next stop/start: `devbox shutdown
+<name> && devbox start <name>`.
 
 **`static_ip`** (default `false`): when `true`, the box gets a reserved external
 IP that survives stop/start. Costs ~$0.005/hr while the VM is stopped. With

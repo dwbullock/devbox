@@ -128,6 +128,8 @@ resource "google_compute_instance" "box" {
         ssh_user           = local.globals.ssh_user
         idle_shutdown_b64  = local.idle_shutdown_b64
         idle_threshold_min = lookup(each.value, "idle_threshold_min", 20)
+        apt_packages       = lookup(each.value, "apt_packages", [])
+        github_repos       = lookup(each.value, "github_repos", [])
       })
     },
     lookup(each.value, "gpu_type", null) != null ? { install-nvidia-driver = "True" } : {},

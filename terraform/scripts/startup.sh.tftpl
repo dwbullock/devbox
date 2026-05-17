@@ -22,3 +22,29 @@ EOF
 
 apt-get update
 apt-get install -y git build-essential python3-pip bc
+%{ if length(apt_packages) > 0 ~}
+apt-get install -y ${join(" ", apt_packages)}
+%{ endif ~}
+
+# Clone public GitHub repos into /mnt/data. Idempotent: skips if already cloned.
+# Future: private repos will accept object form with auth (deploy key / PAT).
+clone_repo() {
+  local spec=$1
+  local url
+  if [[ "$spec" == */* && "$spec" != *://* ]]; then
+    url="https://github.com/$spec.git"
+  else
+    url="$spec"
+  fi
+  local name
+  name=$(basename "$url" .git)
+  local dest="/mnt/data/$name"
+  if [ ! -d "$dest/.git" ]; then
+    echo "→ cloning $url → $dest"
+    git clone --depth 1 "$url" "$dest"
+    chown -R ${ssh_user}:${ssh_user} "$dest"
+  fi
+}
+%{ for spec in github_repos ~}
+clone_repo '${spec}'
+%{ endfor ~}
